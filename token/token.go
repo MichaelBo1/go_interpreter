@@ -35,12 +35,15 @@ const (
 	PLUS
 	MINUS
 
+	EQ
+	NOT_EQ
+
 	SLASH
 	BANG
 	ASTERISK
 
-	LESSTHAN
-	GREATERTHAN
+	LESS_THAN
+	GREATER_THAN
 
 	COMMA
 	SEMICOLON
@@ -83,16 +86,20 @@ func (t TokenType) String() string {
 		return "PLUS"
 	case MINUS:
 		return "MINUS"
+	case EQ:
+		return "EQ"
+	case NOT_EQ:
+		return "NOT_EQ"
 	case SLASH:
 		return "SLASH"
 	case BANG:
 		return "BANG"
 	case ASTERISK:
 		return "ASTERISK"
-	case LESSTHAN:
-		return "LESSTHAN"
-	case GREATERTHAN:
-		return "GREATERTHAN"
+	case LESS_THAN:
+		return "LESS_THAN"
+	case GREATER_THAN:
+		return "GREATER_THAN"
 	case COMMA:
 		return "COMMA"
 	case SEMICOLON:
