@@ -43,7 +43,9 @@ const (
 	ASTERISK
 
 	LESS_THAN
+	LESS_THAN_OR_EQ
 	GREATER_THAN
+	GREATER_THAN_OR_EQ
 
 	COMMA
 	SEMICOLON
@@ -98,8 +100,12 @@ func (t TokenType) String() string {
 		return "ASTERISK"
 	case LESS_THAN:
 		return "LESS_THAN"
+	case LESS_THAN_OR_EQ:
+		return "LESS_THAN_OR_EQ"
 	case GREATER_THAN:
 		return "GREATER_THAN"
+	case GREATER_THAN_OR_EQ:
+		return "GREATER_THAN_OR_EQ"
 	case COMMA:
 		return "COMMA"
 	case SEMICOLON:

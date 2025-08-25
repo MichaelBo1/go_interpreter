@@ -37,6 +37,7 @@ func (l *Lexer) NextToken() token.Token {
 
 	l.eatWhitespace()
 
+	// TODO: extract the two-char token logic.
 	switch l.ch {
 	case '=':
 		if l.peek() == '=' {
@@ -63,9 +64,21 @@ func (l *Lexer) NextToken() token.Token {
 	case '*':
 		tok = token.NewToken(token.ASTERISK, string(l.ch))
 	case '<':
-		tok = token.NewToken(token.LESS_THAN, string(l.ch))
+		if l.peek() == '=' {
+			ch := l.ch
+			l.readChar()
+			tok = token.NewToken(token.LESS_THAN_OR_EQ, string(ch)+string(l.ch))
+		} else {
+			tok = token.NewToken(token.LESS_THAN, string(l.ch))
+		}
 	case '>':
-		tok = token.NewToken(token.GREATER_THAN, string(l.ch))
+		if l.peek() == '=' {
+			ch := l.ch
+			l.readChar()
+			tok = token.NewToken(token.GREATER_THAN_OR_EQ, string(ch)+string(l.ch))
+		} else {
+			tok = token.NewToken(token.GREATER_THAN, string(l.ch))
+		}
 	case ',':
 		tok = token.NewToken(token.COMMA, string(l.ch))
 	case ';':
