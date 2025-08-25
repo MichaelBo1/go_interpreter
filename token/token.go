@@ -7,6 +7,18 @@ type Token struct {
 	Literal string
 }
 
+var keywords = map[string]TokenType{
+	"fn":  FUNCTION,
+	"let": LET,
+}
+
+func FindIdentifier(identifier string) TokenType {
+	if tokType, ok := keywords[identifier]; ok {
+		return tokType
+	}
+	return IDENTIFIER // User-defined identifier.
+}
+
 const (
 	UNKNOWN TokenType = iota
 	EOF
