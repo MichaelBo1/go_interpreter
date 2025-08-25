@@ -1,6 +1,8 @@
 package lexer
 
-import "github.com/MichaelBo1/go_interpreter/token"
+import (
+	"github.com/MichaelBo1/go_interpreter/token"
+)
 
 type Lexer struct {
 	input      string
@@ -21,7 +23,7 @@ func New(input string) *Lexer {
 // need to work for multi-byte-length encodings.
 func (l *Lexer) readChar() {
 	if l.nextPos >= len(l.input) {
-		l.ch = 0
+		l.ch = 0 // Signifier for EOF
 	} else {
 		l.ch = l.input[l.nextPos]
 	}
@@ -40,6 +42,18 @@ func (l *Lexer) NextToken() token.Token {
 		tok = token.NewToken(token.ASSIGN, string(l.ch))
 	case '+':
 		tok = token.NewToken(token.PLUS, string(l.ch))
+	case '-':
+		tok = token.NewToken(token.MINUS, string(l.ch))
+	case '/':
+		tok = token.NewToken(token.SLASH, string(l.ch))
+	case '!':
+		tok = token.NewToken(token.BANG, string(l.ch))
+	case '*':
+		tok = token.NewToken(token.ASTERISK, string(l.ch))
+	case '<':
+		tok = token.NewToken(token.LESSTHAN, string(l.ch))
+	case '>':
+		tok = token.NewToken(token.GREATERTHAN, string(l.ch))
 	case ',':
 		tok = token.NewToken(token.COMMA, string(l.ch))
 	case ';':
@@ -52,11 +66,18 @@ func (l *Lexer) NextToken() token.Token {
 		tok = token.NewToken(token.LBRACE, string(l.ch))
 	case '}':
 		tok = token.NewToken(token.RBRACE, string(l.ch))
+	case 0:
+		tok = token.NewToken(token.EOF, "")
 	default:
 		if isLetter(l.ch) {
 			tok.Literal = l.readIdentifier()
 			tok.Type = token.FindIdentifier(tok.Literal)
 			return tok // Early exit as `readIdentifier` calls readChar() and eats the input.
+		}
+		if isDigit(l.ch) {
+			tok.Type = token.INT
+			tok.Literal = l.readInt()
+			return tok
 		}
 		tok = token.NewToken(token.UNKNOWN, string(l.ch))
 	}
@@ -73,6 +94,14 @@ func (l *Lexer) readIdentifier() string {
 	return l.input[pos:l.currentPos]
 }
 
+func (l *Lexer) readInt() string {
+	pos := l.currentPos
+	for isDigit(l.ch) {
+		l.readChar()
+	}
+	return l.input[pos:l.currentPos]
+}
+
 func (l *Lexer) eatWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
 		l.readChar()
@@ -83,4 +112,8 @@ func (l *Lexer) eatWhitespace() {
 // See (TODO) above for supporting Unicode.
 func isLetter(ch byte) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
+}
+
+func isDigit(ch byte) bool {
+	return '0' <= ch && ch <= '9'
 }

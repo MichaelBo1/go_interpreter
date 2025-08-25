@@ -28,6 +28,14 @@ const (
 
 	ASSIGN
 	PLUS
+	MINUS
+
+	SLASH
+	BANG
+	ASTERISK
+
+	LESSTHAN
+	GREATERTHAN
 
 	COMMA
 	SEMICOLON
@@ -63,6 +71,18 @@ func (t TokenType) String() string {
 		return "ASSIGN"
 	case PLUS:
 		return "PLUS"
+	case MINUS:
+		return "MINUS"
+	case SLASH:
+		return "SLASH"
+	case BANG:
+		return "BANG"
+	case ASTERISK:
+		return "ASTERISK"
+	case LESSTHAN:
+		return "LESSTHAN"
+	case GREATERTHAN:
+		return "GREATERTHAN"
 	case COMMA:
 		return "COMMA"
 	case SEMICOLON:
