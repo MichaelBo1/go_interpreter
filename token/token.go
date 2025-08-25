@@ -8,8 +8,13 @@ type Token struct {
 }
 
 var keywords = map[string]TokenType{
-	"fn":  FUNCTION,
-	"let": LET,
+	"fn":     FUNCTION,
+	"let":    LET,
+	"if":     IF,
+	"else":   ELSE,
+	"return": RETURN,
+	"true":   TRUE,
+	"false":  FALSE,
 }
 
 func FindIdentifier(identifier string) TokenType {
@@ -47,6 +52,11 @@ const (
 
 	FUNCTION
 	LET
+	IF
+	ELSE
+	RETURN
+	TRUE
+	FALSE
 )
 
 func NewToken(tokenType TokenType, literal string) Token {
@@ -99,6 +109,16 @@ func (t TokenType) String() string {
 		return "FUNCTION"
 	case LET:
 		return "LET"
+	case IF:
+		return "IF"
+	case ELSE:
+		return "ELSE"
+	case RETURN:
+		return "RETURN"
+	case TRUE:
+		return "TRUE"
+	case FALSE:
+		return "FALSE"
 	default:
 		return "UNKNOWN"
 	}
