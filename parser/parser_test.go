@@ -22,6 +22,15 @@ func TestParsesLetStatement(t *testing.T) {
 		t.Fatalf("ParseProgram() returned nil")
 	}
 
+	errors := par.Errors()
+	if len(errors) > 0 {
+		t.Errorf("parser had %d errors", len(errors))
+		for _, msg := range errors {
+			t.Errorf("parser error: %q", msg)
+		}
+		t.FailNow()
+	}
+
 	if len(program.Statements) != 3 {
 		t.Fatalf("program.Statements does not contain 3 statements. Got %d statements", len(program.Statements))
 	}
