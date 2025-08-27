@@ -51,5 +51,30 @@ func (p *Parser) parseStatement() ast.Statement {
 }
 
 func (p *Parser) parseLetStatement() *ast.LetStatement {
+	stmt := &ast.LetStatement{Token: p.currentToken}
 
+	if !p.expectPeek(token.IDENTIFIER) {
+		return nil
+	}
+
+	stmt.Name = &ast.Identifier{Token: p.currentToken, Value: p.currentToken.Literal}
+
+	if !p.expectPeek(token.ASSIGN) {
+		return nil
+	}
+
+	// TODO: skipping expression parsing for now;
+	for p.currentToken.Type != token.SEMICOLON {
+		p.NextToken()
+	}
+
+	return stmt
+}
+
+func (p *Parser) expectPeek(expectedType token.TokenType) bool {
+	if p.peekToken.Type == expectedType {
+		p.NextToken()
+		return true
+	}
+	return false
 }
