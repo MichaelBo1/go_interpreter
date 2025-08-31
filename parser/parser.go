@@ -43,6 +43,8 @@ func New(lex *lexer.Lexer) *Parser {
 	parser.prefixParseFns = make(map[token.TokenType]prefixParseFn)
 	parser.registerPrefix(token.IDENTIFIER, parser.parseIdentifier)
 	parser.registerPrefix(token.INT, parser.parseIntegerLiteral)
+	parser.registerPrefix(token.BANG, parser.parsePrefixExpression)
+	parser.registerPrefix(token.MINUS, parser.parsePrefixExpression)
 	// We read two tokens ahead so curToken and peekToken are set by
 	// lexing two tokens. If the input to the lexer is empty, we will
 	// check and see that the curToken is a token.EOF and don't worry about the peekToken in that case.
@@ -130,9 +132,15 @@ func (p *Parser) parseExpressionStament() *ast.ExpressionStatement {
 	return stmt
 }
 
+func (p *Parser) noPrefixParseFnError(t token.TokenType) {
+	msg := fmt.Sprintf("no prefix parse function for %s found", t)
+	p.errors = append(p.errors, msg)
+}
+
 func (p *Parser) parseExpression(precedence OperatorPrecedence) ast.Expression {
 	prefix := p.prefixParseFns[p.currentToken.Type]
 	if prefix == nil {
+		p.noPrefixParseFnError(p.currentToken.Type)
 		return nil
 	}
 	leftExp := prefix()
@@ -155,6 +163,15 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 
 	intLit.Value = value
 	return intLit
+}
+
+func (p *Parser) parsePrefixExpression() ast.Expression {
+	expression := &ast.PrefixExpression{Token: p.currentToken, Operator: p.currentToken.Literal}
+	// We're currently looking at the operator so we shift once to the operand
+	p.NextToken()
+	expression.Right = p.parseExpression(PREFIX)
+
+	return expression
 }
 
 func (p *Parser) peekError(expectedType token.TokenType) {

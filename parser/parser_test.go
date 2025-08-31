@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/MichaelBo1/go_interpreter/ast"
@@ -143,6 +144,52 @@ func TestIntegerLiteralExpression(t *testing.T) {
 	}
 }
 
+func TestParsingPrefixExpressions(t *testing.T) {
+	prefixTests := []struct {
+		input            string
+		expectedOperator string
+		expectedIntValue int64
+	}{
+		{"!5", "!", 5},
+		{"-15", "-", 15},
+	}
+
+	for _, test := range prefixTests {
+		lex := lexer.New(test.input)
+		par := New(lex)
+		program := par.ParseProgram()
+
+		if program == nil {
+			t.Fatalf("ParseProgram() returned nil")
+		}
+		checkParserErrors(t, par)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("program.Statements does not contain %d statements. got=%d\n",
+				1, len(program.Statements))
+		}
+
+		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
+				program.Statements[0])
+		}
+
+		exp, ok := stmt.Expression.(*ast.PrefixExpression)
+		if !ok {
+			t.Fatalf("stmt is not ast.PrefixExpression. got=%T", stmt.Expression)
+		}
+
+		if exp.Operator != test.expectedOperator {
+			t.Fatalf("exp operator is not '%s', got %s", test.expectedOperator, exp.Operator)
+		}
+
+		if !testIntegerLiteral(t, exp.Right, test.expectedIntValue) {
+			return
+		}
+	}
+}
+
 func testLetStatement(t testing.TB, parsedStmt ast.Statement, expectedName string) {
 	t.Helper()
 
@@ -175,4 +222,26 @@ func checkParserErrors(t testing.TB, p *Parser) {
 		}
 		t.FailNow()
 	}
+}
+
+func testIntegerLiteral(t testing.TB, il ast.Expression, expectedValue int64) bool {
+	t.Helper()
+
+	literal, ok := il.(*ast.IntegerLiteral)
+	if !ok {
+		t.Errorf("exp not *ast.IntegerLiteral. got=%T", il)
+		return false
+	}
+
+	if literal.Value != expectedValue {
+		t.Errorf("literal.Value not %d. got=%d", expectedValue, literal.Value)
+		return false
+	}
+
+	if literal.TokenLiteral() != fmt.Sprintf("%d", expectedValue) {
+		t.Errorf("literal.TokenLiteral not %d. got=%s", expectedValue,
+			literal.TokenLiteral())
+		return false
+	}
+	return true
 }
